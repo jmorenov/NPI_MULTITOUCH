@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * @author Javier Moreno
@@ -23,7 +24,7 @@ public class TouchView extends View {
 	private static final int SIZE = 30;
 
 	private Paint mPaint;
-	private Paint paint = new Paint();
+	private Paint paint;
 
 	private SparseArray<PointF> mActivePointers;
 	private SparseArray<Path> paths;
@@ -45,17 +46,6 @@ public class TouchView extends View {
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 	}
-
-	/*@Override
-	 public boolean performClick() {
-	  // Calls the super implementation, which generates an AccessibilityEvent
-	        // and calls the onClick() listener on the view, if any
-	        super.performClick();
-
-	        // Handle the action for the custom click here
-
-	        return true;
-	 }*/
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -67,7 +57,7 @@ public class TouchView extends View {
 
 		// get masked (not specific to a pointer) action
 		int maskedAction = event.getActionMasked();
-
+		
 		switch (maskedAction) {
 
 		case MotionEvent.ACTION_DOWN:
@@ -97,9 +87,7 @@ public class TouchView extends View {
 
 		case MotionEvent.ACTION_UP:
 		case MotionEvent.ACTION_POINTER_UP:
-		case MotionEvent.ACTION_OUTSIDE:
 		case MotionEvent.ACTION_CANCEL: {
-			performClick();
 			mActivePointers.remove(pointerId);
 			paths.remove(pointerId);
 			break;
@@ -107,7 +95,7 @@ public class TouchView extends View {
 		}
 		invalidate();
 
-		return super.onTouchEvent(event);
+		return true;
 	}
 
 	@Override
