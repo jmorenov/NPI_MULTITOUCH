@@ -6,37 +6,37 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.view.MotionEventCompat;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
-public class MainActivity extends Activity
-{
-    private ArrayList<Touch> touchEvents;
-    
+/**
+ * @author Javier Moreno
+ * @version %I%, %G%
+ * @since 1.0
+ */
+public class MainActivity extends Activity {
+    private ArrayList<Touch> touchEvents = new ArrayList<Touch>();
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.activity_main);
+	TouchView paintView = (TouchView)findViewById(R.id.touch_view);
+	paintView.setOnTouchListener(paintView);
     }
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
 	testMultiTouch();
 	super.onStart();
     }
-    
-    public boolean onTouchEvent(MotionEvent event)
-    {
-	
-	return false;
-    }
 
-    private void testMultiTouch()
-    {
+    /*public boolean onTouchEvent(MotionEvent event) {
+	//touchEvents.add(new Touch(event));
+	return true;
+    }*/
+
+    private void testMultiTouch() {
 	Context context = getApplicationContext();
 	CharSequence text;
 	if (hasMultitouch())
@@ -47,8 +47,7 @@ public class MainActivity extends Activity
 	toast.show();
     }
 
-    private boolean hasMultitouch()
-    {
+    private boolean hasMultitouch() {
 	return getPackageManager().hasSystemFeature(
 		PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
     }

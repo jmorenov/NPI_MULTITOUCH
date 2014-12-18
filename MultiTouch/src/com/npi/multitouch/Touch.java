@@ -8,21 +8,21 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 /**
- * @author jmorenov
- *
+ * 
+ * 
+ * @author Javier Moreno
+ * @version %I%, %G%
+ * @since 1.0
  */
-public class Touch
-{
+public class Touch {
     private int mActivePointerId;
     private String DEBUG_TAG = "DEBUG: ";
-    
-    public Touch()
-    {
-	
+
+    public Touch() {
+
     }
-    
-    public Touch(MotionEvent event)
-    {
+
+    public Touch(MotionEvent event) {
 	/*
 	 * // Get the pointer ID mActivePointerId = event.getPointerId(0);
 	 * 
@@ -41,32 +41,27 @@ public class Touch
 	int xPos = -1;
 	int yPos = -1;
 
-	// Log.d(DEBUG_TAG, "The action is " + actionToString(action));
+	Log.d(DEBUG_TAG, "The action is " + actionToString(action));
 
-	if (event.getPointerCount() > 1)
-	{
-	    Log.d(DEBUG_TAG, "Multitouch event");
+	if (event.getPointerCount() > 1) {
+	    Log.d(DEBUG_TAG, "Multitouch event" + index);
 	    // The coordinates of the current screen contact, relative to
 	    // the responding View or Activity.
 	    xPos = (int) MotionEventCompat.getX(event, index);
 	    yPos = (int) MotionEventCompat.getY(event, index);
 
-	}
-	else
-	{
+	} else {
 	    // Single touch event
-	    Log.d(DEBUG_TAG, "Single touch event");
+	    Log.d(DEBUG_TAG, "Single touch event" + index);
 	    xPos = (int) MotionEventCompat.getX(event, index);
 	    yPos = (int) MotionEventCompat.getY(event, index);
 	}
 
     }
-    
+
     // Given an action int, returns a string description
-    public static String actionToString(int action)
-    {
-	switch (action)
-	{
+    public static String actionToString(int action) {
+	switch (action) {
 	case MotionEvent.ACTION_DOWN:
 	    return "Down";
 	case MotionEvent.ACTION_MOVE:

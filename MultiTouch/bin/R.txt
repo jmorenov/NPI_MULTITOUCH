@@ -392,6 +392,8 @@ int id split_action_bar 0x7f090004
 int id submit_area 0x7f09003c
 int id tabMode 0x7f09000c
 int id title 0x7f090027
+int id touch_coordinates 0x7f09003f
+int id touch_view 0x7f090040
 int id up 0x7f090001
 int id useLogo 0x7f090013
 int id withText 0x7f090018
