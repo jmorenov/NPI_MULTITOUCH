@@ -1,112 +1,128 @@
-/**
- * 
- */
 package com.npi.multitouch;
 
-import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Paint.Style;
+import android.graphics.Path;
 import android.graphics.PointF;
-import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnTouchListener;
 
 /**
- * @author jmorenov
- *
+ * @author Javier Moreno
+ * @author Alberto Quesada
+ * @version %I%, %G%
+ * @since 1.0
  */
-public class TouchView extends View implements OnTouchListener {
+public class TouchView extends View {
 
-    Paint mPaint;
-    float mX;
-    float mY;
-    boolean draw = false;
-    float pressure = 0F;
-    int action;
-    int index;
+	private static final int SIZE = 30;
 
-    ArrayList<PointF> points = new ArrayList<PointF>();
-    
-    public TouchView(Context context, AttributeSet attributeSet) {
-	super(context, attributeSet);
+	private Paint mPaint;
+	private Paint paint = new Paint();
 
-	/** Initializing the variables */
-	mPaint = new Paint();
-	mX = mY = -100;
-    }
+	private SparseArray<PointF> mActivePointers;
+	private SparseArray<Path> paths;
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-	if (event.getAction() == MotionEvent.ACTION_DOWN
-		|| event.getAction() == MotionEvent.ACTION_MOVE) {
-	    /*mX = event.getX();
-	    mY = event.getY();*/
-	    action = MotionEventCompat.getActionMasked(event);
-	    index = MotionEventCompat.getActionIndex(event);
-	    mX = (int) MotionEventCompat.getX(event, index);
-	    mY = (int) MotionEventCompat.getY(event, index);
-	    
-	    draw = true;
-	} else
-	    draw = false;
-	return true;
-    }
-
-    /*
-     * @Override public boolean performClick() { // Calls the super
-     * implementation, which generates an AccessibilityEvent // and calls the
-     * onClick() listener on the view, if any super.performClick();
-     * 
-     * // Handle the action for the custom click here
-     * 
-     * return true; }
-     */
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-	super.onDraw(canvas);
-
-	if (draw) {
-	    // Setting the color of the circle
-	    mPaint.setColor(Color.GREEN);
-
-	    // Draw the circle at (x,y) with radius 15
-	    // canvas.drawCircle(mX, mY, 15, mPaint);
-	    for(PointF p : points)
-		canvas.drawCircle(p.x, p.y, 30, mPaint);
-
+	public TouchView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		initView();
 	}
-	// Redraw the canvas
-	invalidate();
-    }
 
-    public static String actionToString(int action) {
-	switch (action) {
-	case MotionEvent.ACTION_DOWN:
-	    return "Down";
-	case MotionEvent.ACTION_MOVE:
-	    return "Move";
-	case MotionEvent.ACTION_POINTER_DOWN:
-	    return "Pointer Down";
-	case MotionEvent.ACTION_UP:
-	    return "Up";
-	case MotionEvent.ACTION_POINTER_UP:
-	    return "Pointer Up";
-	case MotionEvent.ACTION_OUTSIDE:
-	    return "Outside";
-	case MotionEvent.ACTION_CANCEL:
-	    return "Cancel";
+	private void initView() {
+		mActivePointers = new SparseArray<PointF>();
+		paths = new SparseArray<Path>();
+
+		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		mPaint.setStyle(Paint.Style.STROKE);
+
+		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		paint.setStrokeWidth(6f);
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setStrokeJoin(Paint.Join.ROUND);
 	}
-	return "";
-    }
+
+	/*@Override
+	 public boolean performClick() {
+	  // Calls the super implementation, which generates an AccessibilityEvent
+	        // and calls the onClick() listener on the view, if any
+	        super.performClick();
+
+	        // Handle the action for the custom click here
+
+	        return true;
+	 }*/
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// get pointer index from the event object
+		int pointerIndex = event.getActionIndex();
+
+		// get pointer ID
+		int pointerId = event.getPointerId(pointerIndex);
+
+		// get masked (not specific to a pointer) action
+		int maskedAction = event.getActionMasked();
+
+		switch (maskedAction) {
+
+		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_POINTER_DOWN: {
+			// We have a new pointer. Lets add it to the list of pointers
+			PointF point = new PointF();
+			point.x = event.getX(pointerIndex);
+			point.y = event.getY(pointerIndex);
+			mActivePointers.put(pointerId, point);
+			Path path = new Path();
+			path.moveTo(point.x, point.y);
+			paths.put(pointerId, path);
+			break;
+		}
+		case MotionEvent.ACTION_MOVE: { // a pointer was moved
+			for (int size = event.getPointerCount(), i = 0; i < size; i++) {
+				PointF point = mActivePointers.get(event.getPointerId(i));
+				Path path = paths.get(event.getPointerId(i));
+				if (point != null && path != null) {
+					point.x = event.getX(i);
+					point.y = event.getY(i);
+					path.lineTo(point.x, point.y);
+				}
+			}
+			break;
+		}
+
+		case MotionEvent.ACTION_UP:
+		case MotionEvent.ACTION_POINTER_UP:
+		case MotionEvent.ACTION_OUTSIDE:
+		case MotionEvent.ACTION_CANCEL: {
+			performClick();
+			mActivePointers.remove(pointerId);
+			paths.remove(pointerId);
+			break;
+		}
+		}
+		invalidate();
+
+		return super.onTouchEvent(event);
+	}
+
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+
+		if (mActivePointers.size() > 1 && paths.size() > 1) {
+			// draw all pointers
+			for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+				PointF point = mActivePointers.valueAt(i);
+				Path path = paths.valueAt(i);
+				canvas.drawCircle(point.x, point.y, SIZE, mPaint);
+				canvas.drawPath(path, paint);
+			}
+		}
+	}
 
 }
