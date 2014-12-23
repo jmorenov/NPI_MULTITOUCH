@@ -34,7 +34,7 @@ import android.view.View;
  * 
  * @author Francisco Javier Moreno Vega
  * @author Alberto Quesada Aranda
- * @version 19.12.2014
+ * @version 23.12.2014
  * @since 17.12.2014
  */
 public class TouchView extends View {
@@ -107,6 +107,8 @@ public class TouchView extends View {
     }
 
     /**
+     * Método que se llama cuando se detecta una pulsación en la pantalla.
+     * 
      * Implement this method to handle touch screen motion events.
      * 
      * If this method is used to detect click actions, it is recommended that
@@ -120,6 +122,8 @@ public class TouchView extends View {
      *            The motion event
      * 
      * @return True if the event was handled, false otherwise.
+     * 
+     * @see onDraw(Canvas canvas)
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -127,8 +131,8 @@ public class TouchView extends View {
 	int pointerId = event.getPointerId(pointerIndex);
 	int maskedAction = event.getActionMasked();
 
+	// Tipo de acción que ha sido detectada.
 	switch (maskedAction) {
-
 	case MotionEvent.ACTION_DOWN:
 	case MotionEvent.ACTION_POINTER_DOWN: {
 	    PointF point = new PointF();
@@ -167,10 +171,15 @@ public class TouchView extends View {
     }
 
     /**
-     * Implement this to do your drawing.
+     * Método que se llama cuando se vuelve a pintar la vista de la pantalla. En
+     * nuestro caso al inicio y al llamar a invalidate() en onTouchEvent()
+     * 
+     *      Implement this to do your drawing.
      * 
      * @param canvas
      *            the canvas on which the background will be drawn.
+     *            
+     * @see onTouchEvent(MotionEvent event)
      */
     @Override
     protected void onDraw(Canvas canvas) {

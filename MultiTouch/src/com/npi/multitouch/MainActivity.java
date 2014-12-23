@@ -46,6 +46,7 @@ public class MainActivity extends Activity {
      * onDestroy() will be immediately called without any of the rest of the
      * activity lifecycle (onStart(), onResume(), onPause(), etc) executing.
      *
+     *
      * @param savedInstanceState
      *            If the activity is being re-initialized after previously being
      *            shut down then this Bundle contains the data it most recently
